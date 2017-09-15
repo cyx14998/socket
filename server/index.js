@@ -15,7 +15,7 @@ var onLineUsers = {};
 /* 在线人数*/
 var onLineCounts = 0;
 
-/*io监听到存在链接，此时回调一个socket进行socket监听*/
+/*io监听到存在连接，此时回调一个socket进行socket监听*/
 io.on('connection', function (socket) {
     console.log('a user connected');
     /*监听新用户加入*/

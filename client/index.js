@@ -1,5 +1,5 @@
 /**
- * Created by bamboo on 2016/3/31.
+ * Created by cyx on 2017/9/15.
  */
 /*即时运行函数*/
 (function () {
@@ -38,6 +38,20 @@
                 };
                 //如在服务器端代码所说，此对象就行想要发送的信息和发送人组合成为对象一起发送。
                 this.socket.emit('message', obj);
+                d.getElementById('content').value = '';
+            }
+            return false;
+        },
+        secSubmit: function(){
+            var content = d.getElementById('content').value;
+            if (content != '') {
+                var obj = {
+                    userId: this.userId,
+                    userName: this.userName,
+                    content: content
+                };
+                //如在服务器端代码所说，此对象就行想要发送的信息和发送人组合成为对象一起发送。
+                this.socket.emit('secmessage', obj);
                 d.getElementById('content').value = '';
             }
             return false;
@@ -120,7 +134,9 @@
                 //判断消息是不是自己发送的
                 var isMe = (obj.userId === CHAT.userId);
                 var contentDiv = '<div>' + obj.content + '</div>';
-                var userNameDiv = '<span>' + obj.userName + '</span>';
+
+                //判断发送的是否是秘密消息
+                var userNameDiv = (!isMe && obj.sec) ? '<span>神秘人物</span>' : '<span>' + obj.userName + '</span>';
                 var section = d.createElement('section');
                 if (isMe) {
                     section.className = 'user';
@@ -147,7 +163,6 @@
      * */
     //通过“回车键”提交用户名
     d.getElementById('userName').onkeydown = function (e) {
-        console.log(e);
         e = e || event;
         if (e.keyCode === 13) {
             CHAT.userNameSubmit();

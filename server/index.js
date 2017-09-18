@@ -53,6 +53,15 @@ io.on('connection', function (socket) {
         io.emit('message', obj);
         console.log(obj.userName, "说了:", obj.content);
     });
+    // 用户发送秘密消息
+    socket.on('secmessage', function (obj) {
+        "use strict";
+        /*监听到有用户发秘密消息，将该消息广播给所有客户端*/
+        // 打个tag。告诉客户端，这是秘密消息
+        obj.sec = true;
+        io.emit('message', obj);
+        console.log(obj.userName, "说了:", obj.content);
+    });
 });
 /*监听3000*/
 http.listen(3000, function (req, res) {

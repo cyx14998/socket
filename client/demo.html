@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<style>
+    .none{
+        display: none;
+    }
+</style>
+
+<body>
+    <h2>WebSocket Test</h2>
+    <div class="chat-page none">
+        <div id="output"></div>
+        <div class="chat-dom">
+            <input type="text" class="chat-input">
+            <button class="chat-submit">发送消息</button>
+        </div>
+    </div>
+    <div class="login-page">
+        <div class="login-dom">
+            请输入用户名<input type="text" class="login-input">
+        </div>
+        <button class="login">提交</button>
+    </div>
+    
+    <script src="./jquery.js"></script>
+    <script type="text/javascript">  
+        var wsUri = "ws://192.168.2.213/emapi/websocket?user=";
+        var output;
+        var websocket;
+
+        var socket = {
+            init: function () {
+                output = document.getElementById("output");
+                $('.login').on('click', function(){
+                    var val = $('.login-input').val();
+                    socket.testWebSocket(val);
+                });
+                $('.login-input').on('keydown', function(e){
+                    e = e || event;
+                    if (e.keyCode === 13) {
+                        var val = $('.login-input').val();
+                        socket.testWebSocket(val);
+                    }
+                });
+                $('.chat-submit').on('click', function(){
+                    var chat_msg = $('.chat-input').val();
+                    socket.doSend('abc|' + chat_msg);
+                    $('.chat-input').val('');
+                });
+                $('.chat-input').on('keydown', function(e){
+                    e = e || event;
+                    if (e.keyCode === 13) {
+                        var chat_msg = $('.chat-input').val();
+                        socket.doSend('abc|' + chat_msg);
+                        $('.chat-input').val('');
+                    }
+                });
+                // socket.testWebSocket();
+            },
+            testWebSocket: function (userName) {
+                websocket = new WebSocket(wsUri + userName);
+                websocket.onopen = function (evt) {
+                    socket.onOpen(evt)
+                };
+                websocket.onclose = function (evt) {
+                    socket.onClose(evt)
+                };
+                websocket.onmessage = function (evt) {
+                    socket.onMessage(evt)
+                };
+                websocket.onerror = function (evt) {
+                    socket.onError(evt)
+                };
+                console.log(websocket)
+            },
+            //连接
+            onOpen: function (evt) {
+                socket.writeToScreen("connected");
+                $('.login-page').addClass('none');
+                $('.chat-page').removeClass('none');
+                //socket.doSend("WebSocket rocks");
+            },
+            //发送消息
+            doSend: function (message) {
+                socket.writeToScreen("SENT: " + message);
+                websocket.send(message);
+            },
+            //接受消息
+            onMessage: function (evt) {
+                console.log(evt)
+                socket.writeToScreen('<span style="color: blue;">response: ' + evt.data + '</span>');
+                //websocket.close();
+            },
+            //掉线
+            onClose: function (evt) {
+                socket.writeToScreen("disconnected");
+            },
+            //错误
+            onError: function (evt) {
+                socket.writeToScreen('<span style="color: red;">error:</span> ' + evt.data);
+            },
+            writeToScreen: function (message) {
+                var pre = document.createElement("p");
+                pre.style.wordWrap = "break-word";
+                pre.innerHTML = message;
+                output.appendChild(pre);
+            }
+        };
+        
+        window.addEventListener("load", socket.init, false);  
+    </script>
+</body>
+
+</html>
